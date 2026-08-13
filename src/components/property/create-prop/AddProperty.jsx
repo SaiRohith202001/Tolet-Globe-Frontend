@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { BASE_URL } from "../../../constant/constant";
 
 const AddProperty = () => {
   const {
@@ -31,9 +32,8 @@ const AddProperty = () => {
         formData.append("images", images[i]);
       }
 
-      // change backend url to Base url when pushing to main branch e.g ${BASE_URL}property/add-property
       const response = await axios.post(
-        "http://localhost:8000/api/v1/property/add-property",
+        `${BASE_URL}property/add-property`,
         formData,
         {
           headers: {
