@@ -1,7 +1,10 @@
 import "animate.css";
 import location from "../../../assets/getintouch/toletglobelocationimage.jpg";
-import { useRef, useState } from "react";
-import { API } from "../../../config/axios";
+import { useState } from "react";
+import {
+  getContactErrorMessage,
+  submitContactEnquiry,
+} from "../../../config/contactEnquiry";
 import { toast } from "react-hot-toast";
 
 export const ContactUs = () => {
@@ -30,25 +33,20 @@ export const ContactUs = () => {
       topic: "",
     });
   };
-
-
   const handleSubmit = async (evt) => {
-  try {
-    evt.preventDefault(); // Prevent the default form submission
+    evt.preventDefault();
     setLoading(true);
-    const dataForEnquiry = formData;
-    const response2 = await API.post("contact/submit-data", dataForEnquiry);
-    handleReset();
-    toast.success("Enquiry Sent! We will get in touch with you shortly.");
-    setLoading(false);
-    console.log(response2);
-  } 
-  catch (error) {
-    console.log(error);
-    handleReset();
-    toast.error("Something went wrong. Please try again later.");
-    setLoading(false);
-  }
+
+    try {
+      const response = await submitContactEnquiry(formData);
+      handleReset();
+      toast.success(response.message);
+    } catch (error) {
+      console.error("Contact enquiry submission failed:", error);
+      toast.error(getContactErrorMessage(error));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const googlemaps =

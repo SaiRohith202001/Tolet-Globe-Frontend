@@ -2,8 +2,11 @@
 
 import { BsChatRightDots } from "react-icons/bs";
 import { IoCallOutline } from "react-icons/io5";
-import { useRef, useState } from "react";
-import { API } from "../../config/axios";
+import { useState } from "react";
+import {
+  getContactErrorMessage,
+  submitContactEnquiry,
+} from "../../config/contactEnquiry";
 import { toast } from "react-hot-toast";
 
 const Contact = () => {
@@ -32,25 +35,20 @@ const Contact = () => {
       topic: "",
     });
   };
-  
-
   const handleSubmit = async (evt) => {
-  try {
-    evt.preventDefault(); // Prevent the default form submission
+    evt.preventDefault();
     setLoading(true);
-    const dataForEnquiry = formData;
-    const response2 = await API.post("contact/submit-data", dataForEnquiry);
-    handleReset();
-    toast.success("Enquiry Sent! We will get in touch with you shortly.");
-    setLoading(false);
-    console.log(response2);
-  } 
-  catch (error) {
-    console.log(error);
-    handleReset();
-    toast.error("Something went wrong. Please try again later.");
-    setLoading(false);
-  }
+
+    try {
+      const response = await submitContactEnquiry(formData);
+      handleReset();
+      toast.success(response.message);
+    } catch (error) {
+      console.error("Contact enquiry submission failed:", error);
+      toast.error(getContactErrorMessage(error));
+    } finally {
+      setLoading(false);
+    }
   };
 
 
@@ -176,7 +174,10 @@ const Contact = () => {
               <span className="text-black">Sending...</span>
             </div>
           ):(
-            <button className="mt-6 bg-[#6CC1B6] w-full text-black py-3 px-4 rounded-lg">
+            <button
+             type="submit"
+             className="mt-6 bg-[#6CC1B6] w-full text-black py-3 px-4 rounded-lg"
+            >
             Submit Query
             </button>
           )}
@@ -188,5 +189,4 @@ const Contact = () => {
 };
 
 export default Contact;
-
 
