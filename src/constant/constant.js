@@ -1,4 +1,5 @@
-// export const BASE_URL = "https://to-let-backend.onrender.com/api/v1/";
+const DEFAULT_API_BASE_URL = "http://localhost:8000/api/v1";
+const configuredBaseUrl =
+  import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL;
 
-// export const BASE_URL = "http://localhost:8000/api/v1/";
-export const BASE_URL = "https://13.232.171.196:8000/api/v1/";
+export const BASE_URL = `${configuredBaseUrl.trim().replace(/\/+$/, "")}/`;

@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import drop from "../../../assets/property/drop.png";
+import axios from "axios";
+import { BASE_URL } from "../../../constant/constant";
 const Filters = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState({
@@ -56,7 +58,7 @@ const Filters = () => {
 
     console.log(queryString);
 
-    const url = `http://localhost:8000/api/v1/property/filter?${queryString}`;
+    const url = `${BASE_URL}property/filter?${queryString}`;
 
     try {
       const response = await axios.get(url);

@@ -20,7 +20,14 @@ const Register = () => {
   const [role, setRole] = useState("");
   const [userType, setUserType] = useState("");
   const [answer, setAnswer] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+
+  const getMessage = (data, fallback) => {
+    if (typeof data === "string") return data;
+    if (data && typeof data.message === "string") return data.message;
+    return fallback;
+  };
 
   const handleRoleChange = (e) => {
     setRole(e.target.value);
@@ -45,8 +52,9 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent refreshing of the page while submitting the form
+    setIsSubmitting(true);
     try {
-      const res = await API.post("auth/register", {
+      const res = await API.post("/auth/register", {
         username,
         email,
         password,
@@ -55,17 +63,21 @@ const Register = () => {
         userType,
         answer,
       });
-      console.log(res.data);
       if (res.data) {
         resetFields();
-        toast.success(res.data);
+        toast.success(getMessage(res.data, "Registration successful"));
         setTimeout(() => {
           navigate("/login");
         }, 3000);
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.response.data);
+      console.error("Registration failed:", error);
+      const fallbackMessage = error?.response
+        ? "Registration failed. Please try again."
+        : "Cannot reach backend. Please start backend server and verify API URL.";
+      toast.error(getMessage(error?.response?.data, fallbackMessage));
+    } finally {
+      setIsSubmitting(false);
     }
     // console.log(username, email, password, phone, role, userType, answer);
   };
@@ -132,14 +144,10 @@ const Register = () => {
               id="role"
               value={role}
               onChange={handleRoleChange}
+              required
               className="w-full h-8 bg-black border-b border-white text-[#3CBDB1] placeholder:text-[#3CBDB1] placeholder:text-sm placeholder:tracking-wider pl-2 text-lg outline-none"
             >
-              <option
-                value=""
-                disabled
-                selected
-                className="text-[#3CBDB1] text-sm"
-              >
+              <option value="" disabled className="text-[#3CBDB1] text-sm">
                 Select Role
               </option>
               <option value="admin" className="text-[#3CBDB1] text-sm">
@@ -163,6 +171,7 @@ const Register = () => {
                 id="userType"
                 value={userType}
                 onChange={handleUserTypeChange}
+                required
                 className="w-full h-8 bg-black border-b border-white text-[#3CBDB1] placeholder:text-[#3CBDB1] placeholder:text-sm placeholder:tracking-wider pl-2 text-sm outline-none"
               >
                 <option value="" disabled className="text-[#3CBDB1]">
@@ -195,9 +204,10 @@ const Register = () => {
           <div className="relative w-[300px] h-[40px] mt-[70px] transition-all">
             <button
               type="submit"
+              disabled={isSubmitting}
               className="absolute w-full h-full text-xl tracking-wider border border-[#C8A217] rounded-full bg-black flex items-center justify-center text-white hover:bg-[#C8A217]"
             >
-              REGISTER
+              {isSubmitting ? "REGISTERING..." : "REGISTER"}
             </button>
           </div>
         </form>
